@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  # Serviço de Zookeeper
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Serviço de descoberta de serviço (service-discovery)
+  service-discovery:
+    image: service-discovery/service-discovery:latest
+    container_name: service-discovery
+    environment:
+      - SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING=zookeeper:2181
+    ports:
+      - "8089:8089"
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8089"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Serviço CategoriaMeme
+  categoria-meme:
+    image: categoria-meme/categoria-meme:latest
+    container_name: categoria-meme
+    environment:
+      - SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING=zookeeper:2181
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-categoriameme:27017/categoria-meme
+    ports:
+      - "8081:8081"
+    depends_on:
+      - service-discovery
+      - mongo-categoriameme
+
+  # Serviço Meme
+  meme:
+    image: meme/meme:latest
+    container_name: meme
+    environment:
+      - SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING=zookeeper:2181
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-meme:27017/meme
+    ports:
+      - "8082:8082"
+    depends_on:
+      - service-discovery
+      - mongo-meme
+
+  # Serviço Usuario
+  usuario:
+    image: usuario/usuario:latest
+    container_name: usuario
+    environment:
+      - SPRING_CLOUD_ZOOKEEPER_CONNECT_STRING=zookeeper:2181
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-usuario:27017/usuario
+    ports:
+      - "8083:8083"
+    depends_on:
+      - service-discovery
+      - mongo-usuario
+
+  # MongoDB para o CategoriaMeme
+  mongo-categoriameme:
+    image: mongo:latest
+    container_name: mongo-categoriameme
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-categoriameme-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB para o Meme
+  mongo-meme:
+    image: mongo:latest
+    container_name: mongo-meme
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-meme-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB para o Usuario
+  mongo-usuario:
+    image: mongo:latest
+    container_name: mongo-usuario
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-usuario-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus para coletar métricas
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Arquivo de configuração do Prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - service-discovery
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Loki para coleta de logs
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yml  # Arquivo de configuração do Loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3100/metrics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana para visualização dos dados
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo-categoriameme-data:
+  mongo-meme-data:
+  mongo-usuario-data:

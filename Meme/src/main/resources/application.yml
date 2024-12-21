@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: Meme  # Nome do microsserviço
+    mongodb:
+      database: meme  # Banco de dados MongoDB do microsserviço
+      uri: mongodb://localhost:27017/meme  # URI do MongoDB
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181  # Endereço do Zookeeper
+      discovery:
+        enabled: true # Habilita o registro do serviço
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+server:
+  port: 8082  # Porta do microsserviço
+
+otel:
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
+      protocol: grpc
+  service:
+    name: meme

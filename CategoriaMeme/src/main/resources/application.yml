@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: CategoriaMeme  # Nome do microsserviço
+    mongodb:
+      database: categoriameme  # Banco de dados MongoDB do microsserviço
+      uri: mongodb://mongo-categoriameme:27017/categoriameme
+  cloud:
+    zookeeper:
+      connect-string: zookeeper:2181  # Endereço do Zookeeper
+      discovery:
+        enabled: true  # Habilita o registro do serviço
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+server:
+  port: 8081  # Porta do microsserviço
+
+# Prometheus Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "metrics", "prometheus"]  # Adiciona o endpoint Prometheus
+  endpoint:
+    metrics:
+      enabled: true
+
+# Loki Configuration
+logging:
+  loggers:
+    com.example: DEBUG  # Exemplo de configuração de logger (personalize conforme necessário)
+  level:
+    org.springframework.web: DEBUG
+
+loki:
+  enabled: true
+  url: http://loki:3100/loki/api/v1/push  # URL do Loki
+  labels:
+    service: CategoriaMeme  # Etiqueta associada ao serviço para organização nos logs

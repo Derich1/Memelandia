@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: api-gateway
+    gateway:
+      routes:
+        - id: categoria-meme
+          uri: lb://CategoriaMeme
+          predicates:
+            - Path=/categorias/**
+        - id: meme
+          uri: lb://Meme
+          predicates:
+            - Path=/memes/**
+        - id: usuario
+          uri: lb://Usuarios
+          predicates:
+            - Path=/usuarios/**
+
+server:
+  port: 8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

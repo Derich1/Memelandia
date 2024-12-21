@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: service-discovery # Nome do seu microsserviço
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181 # Endereço do seu servidor Zookeeper
+      discovery:
+        enabled: true
+        base-path: /services # Caminho base para registrar os serviços

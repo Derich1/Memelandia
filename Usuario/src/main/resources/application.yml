@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: Usuario  # Nome do microsserviço
+    mongodb:
+      database: usuario  # Banco de dados MongoDB do microsserviço
+      uri: mongodb://localhost:27017/usuario  # URI do MongoDB
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181  # Endereço do Zookeeper
+      discovery:
+        enabled: true # Habilita o registro do serviço
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+server:
+  port: 8083  # Porta do microsserviço
+
+otel:
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
+      protocol: grpc
+  service:
+    name: usuario
