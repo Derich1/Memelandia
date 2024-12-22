@@ -6,10 +6,14 @@ scrape_configs:
     static_configs:
       - targets: ['categoria-meme:8081']  # Nome do serviço 'CategoriaMeme' no Docker
     metrics_path: '/actuator/prometheus'
+
   - job_name: 'meme'
     static_configs:
-      - targets: ['meme:8082']
+      - targets: [ 'meme:8082' ]  # Nome do serviço 'CategoriaMeme' no Docker
+    metrics_path: '/actuator/prometheus'
+
   - job_name: 'usuario'
     static_configs:
-      - targets: [ 'usuario:8083' ]
+      - targets: [ 'usuario:8083' ]  # Nome do serviço 'CategoriaMeme' no Docker
+    metrics_path: '/actuator/prometheus'
 

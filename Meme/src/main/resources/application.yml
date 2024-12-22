@@ -3,29 +3,38 @@ spring:
     name: Meme  # Nome do microsserviço
     mongodb:
       database: meme  # Banco de dados MongoDB do microsserviço
-      uri: mongodb://localhost:27017/meme  # URI do MongoDB
+      uri: mongodb://mongo-meme:27017/meme
   cloud:
     zookeeper:
-      connect-string: localhost:2181  # Endereço do Zookeeper
+      connect-string: zookeeper:2181  # Endereço do Zookeeper
       discovery:
-        enabled: true # Habilita o registro do serviço
+        enabled: true  # Habilita o registro do serviço
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-
 server:
   port: 8082  # Porta do microsserviço
 
-otel:
-  traces:
-    exporter: otlp
-  metrics:
-    exporter: none
-  logs:
-    exporter: none
-  exporter:
-    otlp:
-      endpoint: http://localhost:4317
-      protocol: grpc
-  service:
-    name: meme
+# Prometheus Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "metrics", "prometheus"]  # Adiciona o endpoint Prometheus
+  endpoint:
+    metrics:
+      enabled: true
+      path: "/actuator/prometheus"
+
+# Loki Configuration
+logging:
+  loggers:
+    com.example: DEBUG  # Exemplo de configuração de logger (personalize conforme necessário)
+  level:
+    org.springframework.web: DEBUG
+
+loki:
+  enabled: true
+  url: http://loki:3100/loki/api/v1/push  # URL do Loki
+  labels:
+    service: Meme  # Etiqueta associada ao serviço para organização nos logs

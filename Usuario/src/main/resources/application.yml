@@ -3,10 +3,10 @@ spring:
     name: Usuario  # Nome do microsserviço
     mongodb:
       database: usuario  # Banco de dados MongoDB do microsserviço
-      uri: mongodb://localhost:27017/usuario  # URI do MongoDB
+      uri: mongodb://mongo-usuario:27017/usuario
   cloud:
     zookeeper:
-      connect-string: localhost:2181  # Endereço do Zookeeper
+      connect-string: zookeeper:2181  # Endereço do Zookeeper
       discovery:
         enabled: true # Habilita o registro do serviço
   autoconfigure:
@@ -16,16 +16,25 @@ spring:
 server:
   port: 8083  # Porta do microsserviço
 
-otel:
-  traces:
-    exporter: otlp
-  metrics:
-    exporter: none
-  logs:
-    exporter: none
-  exporter:
-    otlp:
-      endpoint: http://localhost:4317
-      protocol: grpc
-  service:
-    name: usuario
+# Prometheus Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "metrics", "prometheus"]  # Adiciona o endpoint Prometheus
+  endpoint:
+    metrics:
+      enabled: true
+
+# Loki Configuration
+logging:
+  loggers:
+    com.example: DEBUG  # Exemplo de configuração de logger (personalize conforme necessário)
+  level:
+    org.springframework.web: DEBUG
+
+loki:
+  enabled: true
+  url: http://loki:3100/loki/api/v1/push  # URL do Loki
+  labels:
+    service: Usuario  # Etiqueta associada ao serviço para organização nos logs

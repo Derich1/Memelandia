@@ -2,9 +2,10 @@ package br.com.derich.Usuario.controller;
 
 import br.com.derich.Usuario.entity.Usuario;
 import br.com.derich.Usuario.service.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -12,28 +13,34 @@ import java.util.List;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    private final RestTemplate restTemplate;
-
-    public UsuarioController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    @GetMapping("/{id}")
-    public String logs(@PathVariable Long id) {
-        return "Usuário ID: " + id;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
     @Autowired
     private UsuarioService usuarioService;
 
+    @PostMapping
+    public Usuario cadastraUsuario(@RequestBody Usuario usuario) {
+        logger.info("POST /usuarios - Iniciando cadastro de usuário: {}", usuario);
+        try {
+            Usuario usuarioCadastrado = usuarioService.cadastrarUsuario(usuario);
+            logger.info("POST /usuarios - Usuário cadastrado com sucesso: {}", usuarioCadastrado);
+            return usuarioCadastrado;
+        } catch (Exception e) {
+            logger.error("POST /usuarios - Erro ao cadastrar usuário: {}", e.getMessage());
+            throw e; // ou outro tipo de tratamento de erro
+        }
+    }
 
     @GetMapping
     public List<Usuario> listaUsuarios() {
-        return usuarioService.listarUsuarios();
-    }
-
-    @PostMapping
-    public Usuario cadastraUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.cadastrarUsuario(usuario);
+        logger.info("GET /usuarios - Iniciando busca por todos os usuários.");
+        try {
+            List<Usuario> usuarios = usuarioService.listarUsuarios();
+            logger.info("GET /usuarios - Busca bem-sucedida, total de usuários: {}", usuarios.size());
+            return usuarios;
+        } catch (Exception e) {
+            logger.error("GET /usuarios - Erro ao buscar usuários: {}", e.getMessage());
+            throw e; // ou outro tipo de tratamento de erro
+        }
     }
 }

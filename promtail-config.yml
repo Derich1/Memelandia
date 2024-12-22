@@ -1,0 +1,60 @@
+server:
+  http_listen_port: 9080  # Porta HTTP para o Promtail
+  grpc_listen_port: 9095  # Porta GRPC para o Promtail (caso você precise de integração com outras ferramentas)
+
+positions:
+  filename: /tmp/positions.yaml  # Arquivo onde o Promtail armazena a posição dos logs para não repetir a coleta
+
+clients:
+  - url: http://loki:3100/api/prom/push  # URL do Loki para enviar os logs coletados
+
+scrape_configs:
+  # Coleta de logs gerais de arquivos de log
+  - job_name: 'varlogs'  # Job para coletar logs gerais
+    static_configs:
+      - targets:
+          - localhost  # Localização do Promtail
+        labels:
+          job: varlogs  # Label que identifica este job como logs gerais
+          __path__: /var/log/*log  # Caminho dos logs a serem coletados
+
+  # Coleta de logs específicos de containers Docker
+  - job_name: 'docker'  # Job para coletar logs de containers Docker
+    docker_sd_configs:
+      - host: "unix:///var/run/docker.sock"  # Caminho do socket do Docker para detectar containers
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container'  # Label para armazenar o nome do container
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'job'  # Label para armazenar o nome do job
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'instance'  # Label para armazenar a instância do container
+      - source_labels: ['__meta_docker_container_id']
+        target_label: 'container_id'  # Label para armazenar o ID do container
+
+  # Coleta de logs do microsserviço 'categoriameme'
+  - job_name: 'categoriameme'  # Job para coletar logs do categoria-meme
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: 'categoriameme'  # Label específico para categoria-meme
+          __path__: /var/log/categoria-meme/*.log  # Caminho dos logs do categoria-meme
+
+  # Coleta de logs do microsserviço 'meme'
+  - job_name: 'meme'  # Job para coletar logs do meme
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: 'meme'  # Label específico para meme
+          __path__: /var/log/meme/*.log  # Caminho dos logs do meme
+
+  # Coleta de logs do microsserviço 'usuario'
+  - job_name: 'usuario'  # Job para coletar logs do usuario
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: 'usuario'  # Label específico para usuario
+          __path__: /var/log/usuario/*.log  # Caminho dos logs do usuario

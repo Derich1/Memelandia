@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Serviço de Zookeeper
@@ -41,9 +41,16 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo-categoriameme:27017/categoria-meme
     ports:
       - "8081:8081"
+    volumes:
+      - ./logs/categoria-meme:/var/log/categoria-meme
     depends_on:
       - service-discovery
       - mongo-categoriameme
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/api/prom/push"
+        loki-external-labels: "container=categoria-meme"
 
   # Serviço Meme
   meme:
@@ -54,6 +61,8 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo-meme:27017/meme
     ports:
       - "8082:8082"
+    volumes:
+      - ./logs/meme:/var/log/meme
     depends_on:
       - service-discovery
       - mongo-meme
@@ -67,6 +76,8 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo-usuario:27017/usuario
     ports:
       - "8083:8083"
+    volumes:
+      - ./logs/usuario:/var/log/usuario
     depends_on:
       - service-discovery
       - mongo-usuario
@@ -159,6 +170,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/promtail.yml  # Arquivo de configuração do Promtail
+      - /var/log:/var/log  # Diretório onde os logs estão sendo gravados
+    depends_on:
+      - loki
+    restart: unless-stopped
 
 volumes:
   mongo-categoriameme-data:
