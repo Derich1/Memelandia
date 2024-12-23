@@ -31,6 +31,10 @@ logging:
     com.example: DEBUG  # Exemplo de configuração de logger (personalize conforme necessário)
   level:
     org.springframework.web: DEBUG
+  console:
+    enabled: true
+  file:
+    name: logs/application.log
 
 loki:
   enabled: true
