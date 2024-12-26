@@ -1,5 +1,6 @@
 package br.com.derich.CategoriaMeme.entity;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,11 +12,18 @@ public class CategoriaMeme {
     @Id
     private String id;
 
+    @NotNull
     private String nome;
 
+    @NotNull
     private String descricao;
 
+    @NotNull
     private Date dataCadastro;
+
+    public String getId() {
+        return id;
+    }
 
     public String getNome() {
         return nome;

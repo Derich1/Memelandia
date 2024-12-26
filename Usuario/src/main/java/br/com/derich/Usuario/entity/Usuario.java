@@ -1,10 +1,11 @@
 package br.com.derich.Usuario.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Date;
+import java.util.Date;
 
 @Document(collection = "usuario")
 public class Usuario {
@@ -12,11 +13,18 @@ public class Usuario {
     @Id
     private String id;
 
+    @NotNull
     private String nome;
 
+    @NotNull
     private String email;
 
+    @NotNull
     private Date dataCadastro;
+
+    public String getId() {
+        return id;
+    }
 
     public String getNome() {
         return nome;

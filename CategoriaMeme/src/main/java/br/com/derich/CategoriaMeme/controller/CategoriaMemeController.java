@@ -5,6 +5,7 @@ import br.com.derich.CategoriaMeme.service.CategoriaMemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,17 @@ public class CategoriaMemeController {
 
     @Autowired
     public CategoriaMemeService categoriaMemeService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Void> verificarCategoria(@PathVariable String id) {
+        if (categoriaMemeService.categoriaExiste(id)) {
+            logger.info("Id da categoria foi encontrado.");
+            return ResponseEntity.ok().build();
+        } else {
+            logger.info("Id da categoria não foi encontrado.");
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @GetMapping
     public List<CategoriaMeme> buscaTodos() {
