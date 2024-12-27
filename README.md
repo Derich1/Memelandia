@@ -45,8 +45,8 @@ Memelândia inclui recursos de observabilidade para monitorar o sistema:
 
 ## Estrutura do Repositório
 
-- `/categoria-meme`: Código-fonte do microsserviço CategoriaMeme.
-- `/meme`: Código-fonte do microsserviço Meme.
-- `/usuarios`: Código-fonte do microsserviço Usuários.
+- `/CategoriaMeme`: Código-fonte do microsserviço CategoriaMeme.
+- `/Meme`: Código-fonte do microsserviço Meme.
+- `/Usuario`: Código-fonte do microsserviço Usuários.
 - `/service-discovery`: Código-fonte do ServiceDiscovery.
 - `/docker-compose.yml`: Arquivo de configuração para orquestração dos contêineres.
