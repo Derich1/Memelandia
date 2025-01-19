@@ -25,16 +25,3 @@ management:
   endpoint:
     metrics:
       enabled: true
-
-# Loki Configuration
-logging:
-  loggers:
-    com.example: DEBUG  # Exemplo de configuração de logger (personalize conforme necessário)
-  level:
-    org.springframework.web: DEBUG
-
-loki:
-  enabled: true
-  url: http://loki:3100/loki/api/v1/push  # URL do Loki
-  labels:
-    service: Usuario  # Etiqueta associada ao serviço para organização nos logs
